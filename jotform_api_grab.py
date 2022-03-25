@@ -1,92 +1,88 @@
 import requests
-import os
 from requests.auth import HTTPBasicAuth
-import json
+
+def submission_grab():
+    apiKey = "ffe10abac602b3cfc149ed8af1bc39ab"
+    formID = "220585366483160"
+
+    url = f'https://api.jotform.com/form/{formID}/submissions?apiKey={apiKey}&limit=1000'
 
 
-#yup = requests.get('https://api.planningcenteronline.com/people/v2', auth=('947f0f7e737cb7846eb65850d0eed067b4eed0786b055694a9d2a7a6a27e5e39', ''))
-#print(yup)
-apiKey = "ffe10abac602b3cfc149ed8af1bc39ab"
-formID = "220585366483160"
+    #this is used to create the json object and the data needed exists in the data->items key pairs
+    response = requests.get(url=url).json()
+ 
+    #this subs into the key value that has all submissions
+    submissions = response['content']
+    #print(submissions)
 
-# Create Base64 Encoded Basic Auth Header
-#auth = HTTPBasicAuth(api_key, api_secret)
+    #This will be the list of all the formatted submissions
+    my_list = []
 
-'''
-headers = {
-'Authorization': 'Basic ' + api_key,
-'Content-Type': 'application/json'
-}
-'''
-
-limit = 1000
-#params = {"limit": limit}
-#json_practice ={"url": "https://q0i6ebd0cj.execute-api.us-east-1.amazonaws.com/prod/fivetran_webhooks", "events": ["status"], "active": True}
-#api url
-url = f'https://api.jotform.com/form/{formID}/submissions?apiKey={apiKey}'
-
-
-#this is used to create the json object and the data needed exists in the data->items key pairs
-response = requests.get(url=url).json()
-
-submissions = response['content']
-my_list = []
-for _ in submissions:
-    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-    answers = _['answers']
-    #print(answers)
-    my_dict = {}
-    date = _['created_at']
-    date = date.split(' ')
-
-    my_dict['date'] = date[0]
-    my_dict['form_id'] = _['form_id']
-    for answer in answers:
+    #This is the loop that gets all data that you want for the json objects that will be appended to the list
+    for _ in submissions:
+        print('--------------------------------------------------')
+        print(_)
+        #this grabs all the answers that were submitted in the submission
+        answers = _['answers']
+        #creates a dictionary that will be converted to the json object
+        my_dict = {}
+        per_submission_list = []
+        my_id = _['id']
+        per_submission_list.append(my_id)
+        #This grabs the date category
+        date = _['created_at']
+        date = date.split(' ')
+        my_dict['date'] = date[0]
         
-        try:
-            my_name = answers[answer]['name']
-            my_answer = answers[answer]['answer']
-            alter_name = ''
+        #this gets the form id which will be uniform for all submissions of the same form type
+        my_dict['form_id'] = _['form_id']
+
+        #This will be used to format the answer data to get the fields we want
+        for answer in answers:
             
-            if ord(my_name[0]) < 48 or ord(my_name[0]) > 57 :
-                #print('im here')
-                print(my_name)
-                my_dict[my_name] = my_answer
-            else:
-                for letter in my_name:
-                    if ord(letter) < 48 or ord(letter) > 57:
-                        #print('reached a letter loser')
-                        break
-                    else:
-                        #print('add to alter')
-                        alter_name += letter
-                my_dict[alter_name] = my_answer
-                print(alter_name)
+            '''
+            This try statement is used to see if there is a name and answer category because 
+            some of the answer entries dont have both. Lucky for our use the only ones we 
+            need are the entries that have both.
+            '''
 
-            print(my_answer)
-            print('---------------------------------------')
-        except:
-            pass
-    my_dict['submission_id'] = _['id']
-    my_list.append(my_dict)
-        
+            try:
+                my_name = answers[answer]['name']
+                my_answer = answers[answer]['answer']
+                alter_name = ''
+                
+                #This is used to grab the data, if it passes this conditional that is looking for ascii values then it just makes the key name the name of the given name
+                if ord(my_name[0]) < 48 or ord(my_name[0]) > 57 :
+                    #print('im here')
+                    #print(my_name)
+                    my_dict[my_name] = my_answer
+                
+                #This ascii arithmetic is used to get just the number values of the questions.
+                else:
+                    for letter in my_name:
+                        if ord(letter) < 48 or ord(letter) > 57:
+                            break
+                        else:
+                            alter_name += letter
+                    my_dict[alter_name] = my_answer
+                    
+            #The except part is just necessary just in case an entry doesnt have a name only an answer or vice versa.
+            except:
+                pass
+        my_dict['submission_id'] = _['id']
+        per_submission_list.append(my_dict)
+        my_list.append(per_submission_list)
+            
+
+    #print(my_list)
+
     
+    for _ in my_list:
+        print('----------------------------')
+        print(_)
+        print('----------------------------')
+    print(len(my_list))
+
     
-#print(type(submissions))
-#fun_stuff = response['data']
-#fun_fun_stuff = r['attributes']['name']
-'''
-for _ in fun_stuff: 
 
-    print('++++++++++++++++++++++++++++++++++++++++++++++')
-    print(_)
-    print('++++++++++++++++++++++++++++++++++++++++++++++')
-'''
-'''
-for _ in response['content']:
-    print('++++++++++++++++++++++++++++++++++++++++++++++')
-    print(_)
-    print('++++++++++++++++++++++++++++++++++++++++++++++')
-'''
-
-print(my_list)
+submission_grab()
