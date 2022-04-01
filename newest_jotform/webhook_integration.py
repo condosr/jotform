@@ -113,6 +113,7 @@ def json_to_template_json(form_json_list, formID):
     clean_json_list.append(form_json_list[0])
     clean_json_list.append(form_json_list[1])
     raw_json = form_json_list[2]
+    date = raw_json['date']
     clean_json = {}
     
     s3_client = boto3.client('s3')
@@ -126,6 +127,7 @@ def json_to_template_json(form_json_list, formID):
         clean_json[file_content[_]] = raw_json[_]
     clean_json_list.append(clean_json)
     clean_json['submission_id'] = form_json_list[1]
+    clean_json['date'] = date
     print(clean_json_list)
     return clean_json_list
 
