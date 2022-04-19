@@ -53,14 +53,18 @@ def submission_grab(api_key, form_id):
             name_coming = False
             #print('111111111111111111111111111111111111111111111111111')
             
+            #copy paste from here 
             try:
                 #print('................................................')
                 
                 my_name = answers[answer]['text'].strip()
                 my_name = my_name.replace(',', '')
+                #this conditional is necessary just in case the text field is blank
+                if my_name == "":
+                    my_name = answers[answer]['name']
                 my_answer = answers[answer]['answer']
                 my_dict[my_name] = my_answer
-                #print('................................................')
+            #to here
                     
             #The except part is just necessary just in case an entry doesnt have a name only an answer or vice versa.
             except:
@@ -95,7 +99,11 @@ def api_write(json_list):
         #This variable makes the json object writeable to a file.
         my_obj = json.dumps(json_obj)
         #This variable is the unique path of the current submission file.
-        path = f'/tmp/{file_name}.json'
+        '''
+        need to uncomment this path once testing is over
+        '''
+        #path = f'/tmp/{file_name}.json'
+        path = f'C:\\Users\\Scott\\Documents\\GitHub\\jotform\\newest_jotform\\resources\\exmaple_json\\{file_name}.json'
         #This appends the path variable above to the path_list list object.
         path_list.append(path)
         
@@ -162,14 +170,24 @@ def api_template_build(api_key, form_id):
     for answer in the_answers:
         print('=======================================')
         print(the_answers[answer])
+        print(the_answers[answer]['name'])
+        try:
+            print(the_answers[answer]['answer'])
+        except:
+            print('no answer')
         
         #This try statement will check to see if an answer is present. If it is then it is an actual question rather than a filler. From there,
         #it will take the long text, strip it and remove its commas. It will then make the shorthand the key and the newly formatted text the value. 
+        #copy paste from here
         try:
             answer_test = the_answers[answer]['answer']
             text_question = the_answers[answer]['text'].strip()
             shorthand = the_answers[answer]['name']
+            #this conditional is needed in case the text field is blank
+            if text_question == "":
+                text_question = shorthand
             template_dict[shorthand] = text_question.replace(',', '')
+        #to here
         #This except is just in case there is no answer present.
         except:
             print('Filler or useless question')
@@ -188,7 +206,11 @@ def api_json_template_write(template_dict):
     #This makes the dict object parameter into a json object called my_obj
     my_obj = json.dumps(template_dict)
     #This is the path of the json template
-    path = f'/tmp/{file_name}.json'
+    '''
+    need to change this path back after testing
+    '''
+    #path = f'/tmp/{file_name}.json'
+    path = f'C:\\Users\\Scott\\Documents\\GitHub\\jotform\\newest_jotform\\resources\\template\\{file_name}.json'
     #This creates a new file and has it as a variable of myfile
     with open(path, 'w') as myfile:
         #This writes the json object created above to the file at the specified path

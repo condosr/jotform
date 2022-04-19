@@ -167,7 +167,7 @@ def json_to_template_json(form_json_list, formID):
     #This creates a s3 client object and assigns it to the variable s3_client
     s3_client = boto3.client('s3')
     #This is the name of the bucket where the json template lives
-    S3_BUCKET = 'jotform-stuff'
+    S3_BUCKET = 'the-jotform-bucket'
     #This object key is the path to the template for the specified form.
     object_key = "json_templates/" + formID + "_json_template.json"  # replace object key
     #when loading in the json template, all key/value pairs must be in double quotes not single
