@@ -102,8 +102,8 @@ def api_write(json_list):
         '''
         need to uncomment this path once testing is over
         '''
-        #path = f'/tmp/{file_name}.json'
-        path = f'C:\\Users\\Scott\\Documents\\GitHub\\jotform\\newest_jotform\\resources\\exmaple_json\\{file_name}.json'
+        path = f'/tmp/{file_name}.json'
+        #path = f'C:\\Users\\Scott\\Documents\\GitHub\\jotform\\newest_jotform\\resources\\exmaple_json\\{file_name}.json'
         #This appends the path variable above to the path_list list object.
         path_list.append(path)
         
@@ -209,8 +209,8 @@ def api_json_template_write(template_dict):
     '''
     need to change this path back after testing
     '''
-    #path = f'/tmp/{file_name}.json'
-    path = f'C:\\Users\\Scott\\Documents\\GitHub\\jotform\\newest_jotform\\resources\\template\\{file_name}.json'
+    path = f'/tmp/{file_name}.json'
+    #path = f'C:\\Users\\Scott\\Documents\\GitHub\\jotform\\newest_jotform\\resources\\template\\{file_name}.json'
     #This creates a new file and has it as a variable of myfile
     with open(path, 'w') as myfile:
         #This writes the json object created above to the file at the specified path
