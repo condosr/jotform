@@ -63,7 +63,13 @@ def submission_grab(api_key, form_id):
                 if my_name == "":
                     my_name = answers[answer]['name']
                 my_answer = answers[answer]['answer']
-                my_dict[my_name] = my_answer
+                my_answer_list = list(my_answer)
+                if my_answer_list[0] == '[':
+                    spreadsheet_dict = spreadsheet_make(my_answer, my_name)
+                    for spreadsheet_sub in spreadsheet_dict:
+                        my_dict[spreadsheet_sub] = spreadsheet_dict[spreadsheet_sub]
+                else:
+                    my_dict[my_name] = my_answer
             #to here
                     
             #The except part is just necessary just in case an entry doesnt have a name only an answer or vice versa.
@@ -221,6 +227,75 @@ def api_json_template_write(template_dict):
     print(path)
     return path
     
+'''
+ new function 
+'''   
+
+#Function is fragile and will need work on the string manipulation
+def spreadsheet_make(spreadsheet_answer, spreadsheet_name):
+    #This will be the list of all of the created objects
+    return_dict = {}
+    #This splits the string response into a character list
+    the_list = list(spreadsheet_answer)
+    print('?????????????????????????????????????????????????')
+    #The count is necessary to make the dictionary of the different spreadsheet submissions item with the key 1 will always be fill because that is the umbrella list
+    the_count = 0
+    #This will be the initial dictionary with the sloppy items
+    the_dict = {} 
+    #This string will capture the data between lists
+    the_string = ''
+    #This for loop goes through and breaks up all the lists
+    for _ in range(len(the_list)):
+        #this conditional looks for an open bracket signifying the start of a list(this may be troublesome if an open bracket is put into a question or answer)
+        if the_list[_] ==  '[':
+            #This increases the count to keep the keys for each list unique
+            the_count += 1
+            #This sets an initial value for each list that will be changed later
+            the_dict[the_count] = 'fill'
+            #Sets the string to empty string to keep the list items clean
+            the_string = ''
+        #This conditional catches the end of a list
+        elif the_list[_] == ']':
+            #this adds the string of all contents in the list to the dictionary to the key
+            the_dict[the_count] = the_string
+        else:
+            #This adds all contents of a list to a string 
+            the_string += the_list[_]
+    #This for loop goes through each dictionary and turns the strings into lists(this is a risky/fragile for loop because if there is a comma within the answer it will make it a separate list item)
+    for _ in the_dict:
+        #This looks to make sure that we arent looking at an item that isnt list contents
+        if not the_dict[_] == 'fill':
+            #The entries are surroudned in double quotes that have to be removed thus the replace
+            dic = the_dict[_]#.replace('"', '')
+            #this turns the string into a list splitting on commas
+            print('==============')
+            print(dic)
+            the_split = dic.split(',\"')
+            the_splitter = []
+            for o in the_split:
+                yo = o.replace('"','')
+                the_splitter.append(yo)
+
+            the_dict[_] = the_splitter
+    the_final_list = []
+    for _ in the_dict:
+        if not the_dict[_] == 'fill':
+            the_final_list.append(the_dict[_])
+    for _ in range(len(the_final_list[0])):
+        print('building the dictionary')
+        print(_)
+        if _ == 0:
+            pass
+        else:
+            my_key = spreadsheet_name + ' ' + the_final_list[0][_]
+            print(my_key)
+            return_dict[my_key] = the_final_list[1][_]
+    
+    print('*********************************************')
+    print(the_final_list)    
+    print(return_dict)
+    return return_dict
+
     
         
         
@@ -231,3 +306,63 @@ def api_json_template_write(template_dict):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#go go gadget kill yourself
