@@ -50,14 +50,14 @@ def lambda_handler(event, context):
         
         print('s3_webhook_json_put')
         #This variable references the s3_webhook_json_put function which is a part of the s3_methods.py review line 48 s3_methods.py
-        s3_methods.s3_webhook_json_put(path, formID, bucket_name)
+        #s3_methods.s3_webhook_json_put(path, formID, bucket_name)
         
         result = clean_json_list[2]
     
     else:
         #This call below references teh s3_form_dir_create function within the s3_methods.py file. It creates the directory all of the json objects submissions will go.
         print('s3_form_dir_create')
-        s3_methods.s3_form_dir_create(formID, bucket_name)
+        #s3_methods.s3_form_dir_create(formID, bucket_name)
         
         #This variable references the api_template_build function within the api_integration.py file. It builds the json template for a specific form.
         print('api_template_build')
@@ -70,7 +70,7 @@ def lambda_handler(event, context):
         #May want to do somethign just in case the template gets deleted...
         #This call below references the s3_json_template_put function within the s3_methods.py file. It puts the json template for a specified form within the template directory.
         print('s3_json_template_put')
-        s3_methods.s3_json_template_put(formID, template_path, bucket_name)
+        #s3_methods.s3_json_template_put(formID, template_path, bucket_name)
         
         #This variable references the submission_grab function within the api_integration.py file. It goes through and grabs all the previous submissions utilizing the api, 
         #and creates json objects for each submission
@@ -85,7 +85,7 @@ def lambda_handler(event, context):
         #This call below references the api_json_put function within the s3_methods.py file. It goes through the list of temporary paths for the files created in the previous
         #function and puts all of those files within the s3 bucket. The files are put within the directory created in the first function call for the specified form.
         print('s3_api_json_put')
-        s3_methods.s3_api_json_put(api_json_paths, formID, bucket_name)
+        #s3_methods.s3_api_json_put(api_json_paths, formID, bucket_name)
         result = api_json
         
     
