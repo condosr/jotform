@@ -68,6 +68,11 @@ def submission_grab(api_key, form_id):
                     spreadsheet_dict = spreadsheet_make(my_answer, my_name)
                     for spreadsheet_sub in spreadsheet_dict:
                         my_dict[spreadsheet_sub] = spreadsheet_dict[spreadsheet_sub]
+
+                #new elif statement to catch if a answer is a dictionary type and append all the keys to the master dictionary
+                elif type(my_answer) == dict:
+                    for sub_answer in my_answer:
+                        my_dict[sub_answer] = my_answer[sub_answer]
                 else:
                     my_dict[my_name] = my_answer
             #to here
@@ -189,10 +194,20 @@ def api_template_build(api_key, form_id):
             answer_test = the_answers[answer]['answer']
             text_question = the_answers[answer]['text'].strip()
             shorthand = the_answers[answer]['name']
+            my_answer_list = list(answer_test)
             #this conditional is needed in case the text field is blank
             if text_question == "":
                 text_question = shorthand
-            template_dict[shorthand] = text_question.replace(',', '')
+            #need an elif statement for json objects as value pairs
+            elif type(answer_test) == dict:
+                for sub_answers in answer_test:
+                    template_dict[sub_answers] = sub_answers
+            #elif my_answer_list[0] == '[':
+                    #spreadsheet_dict = spreadsheet_make(answer_test, text_question)
+                    #for spreadsheet_sub in spreadsheet_dict:
+                        #template_dict[spreadsheet_sub] = spreadsheet_sub
+            else:
+                template_dict[shorthand] = text_question.replace(',', '')
         #to here
         #This except is just in case there is no answer present.
         except:
@@ -295,6 +310,8 @@ def spreadsheet_make(spreadsheet_answer, spreadsheet_name):
     print(the_final_list)    
     print(return_dict)
     return return_dict
+
+
 
     
         

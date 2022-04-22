@@ -26,7 +26,7 @@ def lambda_handler(event, context):
     '''
     print('s3_bucket_dir_exist')
     #existing_form = s3_methods.s3_bucket_dir_exist(bucket_name, formID)
-    existing_form = False
+    existing_form = True
     
     
     

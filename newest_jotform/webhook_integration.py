@@ -1,6 +1,6 @@
 import json
 import boto3
-
+from api_integration import spreadsheet_make
 
 def form_id_grab(event):
     
@@ -124,8 +124,13 @@ def json_format(return_list):
         try:
             #This grabs the shorthand
             needed_key = broken_key[1]
-            #This takes the shorthand making it the key and giving the same value to the new key in the new dictionary.
-            cool_dict[needed_key] = raw_json[_]
+            answer_list = list(raw_json[_])
+            if type(raw_json[_]) == dict:
+                for raw_raw_json in raw_json[_]:
+                    cool_dict[raw_raw_json] = raw_json[_][raw_raw_json]
+            else:
+                #This takes the shorthand making it the key and giving the same value to the new key in the new dictionary.
+                cool_dict[needed_key] = raw_json[_]
         #This except statement is if the key is one word without underscores
         except:
             print('One word key')
@@ -165,33 +170,47 @@ def json_to_template_json(form_json_list, formID):
     clean_json = {}
     
     #This creates a s3 client object and assigns it to the variable s3_client
-    s3_client = boto3.client('s3')
+    #s3_client = boto3.client('s3')
     #This is the name of the bucket where the json template lives
     S3_BUCKET = 'the-jotform-bucket'
     #This object key is the path to the template for the specified form.
     object_key = "json_templates/" + formID + "_json_template.json"  # replace object key
     #when loading in the json template, all key/value pairs must be in double quotes not single
-    file_content = json.loads(s3_client.get_object(Bucket=S3_BUCKET, Key=object_key)["Body"].read())
-    
-    print(json.dumps(file_content))
-    print(len(file_content))
-    print(len(raw_json))
-    
-    #This goes through and transforms the shorthand keys into the long text versions of each question
-    for _ in file_content:
-        print(_)
-        print(file_content[_])
-        print(raw_json[_])
-        clean_json[file_content[_]] = raw_json[_]
-    #This appends the new json object with the long text keys to the clean_json_list
-    clean_json_list.append(clean_json)
-    #This adds the submission_id key/value pair to the new dictionary
-    clean_json['submission_id'] = form_json_list[1]
-    #This adds the date key/value pair to the new dictionary 
-    clean_json['submitted_date'] = date
-    print(clean_json_list)
-    #This returns the clean_json_list object with the formID variable at index[0] unique submission id variable at index[1] and the new json object at index[2]
-    return clean_json_list
+    #file_content = json.loads(s3_client.get_object(Bucket=S3_BUCKET, Key=object_key)["Body"].read())
+    #this is for local testing after testing comment out line below then shift all code from the return up to here <- 1 tab
+    with open('C:\\Users\\Scott\\Documents\\GitHub\\jotform\\newest_jotform\\resources\\template\\json_template.json', 'r') as local:
+        
+        file_content = json.loads(local.read())
+        #print(json.dumps(file_content))
+        #print(len(file_content))
+        #print(len(raw_json))
+        
+        #This goes through and transforms the shorthand keys into the long text versions of each question
+        for _ in file_content:
+            #print(_)
+            #print(file_content[_])
+            #print(raw_json[_])
+            answer_list = list(raw_json[_])
+            if answer_list[0] == '[':
+                pass
+            else:
+                clean_json[file_content[_]] = raw_json[_]
+        for _ in raw_json:
+            answer_list = list(raw_json[_])
+            if answer_list[0] == '[':
+                text_question = file_content[_]
+                spreadsheet_dict = spreadsheet_make(raw_json[_], text_question)
+                for spreadsheet_sub in spreadsheet_dict:
+                    clean_json[spreadsheet_sub] = spreadsheet_dict[spreadsheet_sub]
+        #This appends the new json object with the long text keys to the clean_json_list
+        clean_json_list.append(clean_json)
+        #This adds the submission_id key/value pair to the new dictionary
+        clean_json['submission_id'] = form_json_list[1]
+        #This adds the date key/value pair to the new dictionary 
+        clean_json['submitted_date'] = date
+        print(clean_json_list)
+        #This returns the clean_json_list object with the formID variable at index[0] unique submission id variable at index[1] and the new json object at index[2]
+        return clean_json_list
 
 
 
@@ -205,7 +224,9 @@ def template_json_create(clean_json_list):
     #This turns the dictionary object(json_list) into a writeable json object
     my_obj = json.dumps(json_list)
     #This creates a unique path to the file that is about to be created
-    path = f'/tmp/{file_name}.json'
+    #uncomment this after
+    #path = f'/tmp/{file_name}.json'
+    path = f'C:\\Users\\Scott\\Documents\\GitHub\\jotform\\newest_jotform\\resources\\exmaple_json\\{file_name}.json'
     #This creates a new file with the unique path and assigns it to the variable myfile
     with open(path, 'w') as myfile:
         #This writes the json object to myfile
@@ -215,4 +236,9 @@ def template_json_create(clean_json_list):
     print('file has been written')
     #This function returns the path to be referenced by the s3_functions
     return path
+
+
+
+    
+
     
