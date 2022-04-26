@@ -73,6 +73,18 @@ def submission_grab(api_key, form_id):
                 elif type(my_answer) == dict:
                     for sub_answer in my_answer:
                         my_dict[sub_answer] = my_answer[sub_answer]
+                elif type(my_answer) == list:
+                    print(my_answer)
+                    print('im a list element')
+                    temp_string = ''
+                    for element in range (len(my_answer)):
+                        if element == len(my_answer) - 1 or element == 0:
+                            temp_string = temp_string + my_answer[element]
+                        else:
+                            temp_string = temp_string + ', ' + my_answer[element]
+                    print(my_name)
+                    print(temp_string)
+                    my_dict[my_name] = temp_string
                 else:
                     my_dict[my_name] = my_answer
             #to here

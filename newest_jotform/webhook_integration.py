@@ -128,6 +128,19 @@ def json_format(return_list):
             if type(raw_json[_]) == dict:
                 for raw_raw_json in raw_json[_]:
                     cool_dict[raw_raw_json] = raw_json[_][raw_raw_json]
+            elif type(raw_json[_]) == list:
+                my_answer = raw_json[_]
+                print(my_answer)
+                print('im a list element')
+                temp_string = ''
+                for element in range (len(my_answer)):
+                    if element == len(my_answer) - 1 or element == 0:
+                        temp_string = temp_string + my_answer[element]
+                    else:
+                        temp_string = temp_string + ', ' + my_answer[element]
+                print(_)
+                print(temp_string)
+                cool_dict[_] = temp_string
             else:
                 #This takes the shorthand making it the key and giving the same value to the new key in the new dictionary.
                 cool_dict[needed_key] = raw_json[_]
@@ -187,9 +200,9 @@ def json_to_template_json(form_json_list, formID):
         
         #This goes through and transforms the shorthand keys into the long text versions of each question
         for _ in file_content:
-            #print(_)
+            print(_)
             #print(file_content[_])
-            #print(raw_json[_])
+            print(raw_json[_])
             answer_list = list(raw_json[_])
             if answer_list[0] == '[':
                 pass
