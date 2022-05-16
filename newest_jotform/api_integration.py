@@ -36,6 +36,7 @@ def submission_grab(api_key, form_id):
         #This grabs the date category
         date = _['created_at']
         date = date.split(' ')
+        #This grabs only the date portion from the date/time obj
         my_dict['submitted_date'] = date[0]
         
         #this gets the form id which will be uniform for all submissions of the same form type
@@ -53,19 +54,30 @@ def submission_grab(api_key, form_id):
             name_coming = False
             #print('111111111111111111111111111111111111111111111111111')
             
-            #copy paste from here 
+            #This try except statement creates a dictionary based on what is passed. If the value of the key value pair is just a string/int then it will
+            #Execute as normal or else it will fall into one of the specialized conditionals
             try:
-                #print('................................................')
                 
+                #this takes the long hand version of a specified question and stips the white space and assigning it to the my_name variable
                 my_name = answers[answer]['text'].strip()
+                #this takes the variable above and replaces all commas with nospace
                 my_name = my_name.replace(',', '')
                 #this conditional is necessary just in case the text field is blank
                 if my_name == "":
+                    #if it is blank it just takes the shorthand version instead as the name
                     my_name = answers[answer]['name']
+                #This grabs the answer from the answer key/pair value
                 my_answer = answers[answer]['answer']
-                my_answer_list = list(my_answer)
+                #This turns my_answer into a list if possible(mostly if its a string)
+                try:
+                    my_answer_list = list(my_answer)
+                except:
+                    print('not list mutable')
+                #this looks to see if the first char in the string is a [. If it is, then it is a spreadsheet typed object and will be dealt with using the spreadsheet_dict function
                 if my_answer_list[0] == '[':
+                    #This calls the spreadsheet_dict function passing the answer and the question as parameters
                     spreadsheet_dict = spreadsheet_make(my_answer, my_name)
+                    #This loops through the dictionary that is returned from the spreadsheet_dict function and adds all elements into the dictionary object
                     for spreadsheet_sub in spreadsheet_dict:
                         my_dict[spreadsheet_sub] = spreadsheet_dict[spreadsheet_sub]
 
@@ -73,21 +85,24 @@ def submission_grab(api_key, form_id):
                 elif type(my_answer) == dict:
                     for sub_answer in my_answer:
                         my_dict[sub_answer] = my_answer[sub_answer]
+                #this elif statement looks to see if the answer is a list. If it is it will turn the list into a string with all answers separated by commas 
                 elif type(my_answer) == list:
-                    print(my_answer)
-                    print('im a list element')
                     temp_string = ''
                     for element in range (len(my_answer)):
-                        if element == len(my_answer) - 1 or element == 0:
+                        if len(my_answer) == 2:
+                            temp_string = temp_string + my_answer[element] + ', ' + my_answer[element + 1]
+                            break    
+                        elif element == len(my_answer) - 1 or element == 0:
                             temp_string = temp_string + my_answer[element]
+                        elif element == len(my_answer) - 2:
+                            temp_string = temp_string + ', ' + my_answer[element] + ', '
                         else:
                             temp_string = temp_string + ', ' + my_answer[element]
-                    print(my_name)
-                    print(temp_string)
                     my_dict[my_name] = temp_string
+                #this last statement is if there is no changes needed and just adds the key/pair value of question and answer
                 else:
                     my_dict[my_name] = my_answer
-            #to here
+            
                     
             #The except part is just necessary just in case an entry doesnt have a name only an answer or vice versa.
             except:
@@ -122,11 +137,7 @@ def api_write(json_list):
         #This variable makes the json object writeable to a file.
         my_obj = json.dumps(json_obj)
         #This variable is the unique path of the current submission file.
-        '''
-        need to uncomment this path once testing is over
-        '''
-        #path = f'/tmp/{file_name}.json'
-        path = f'C:\\Users\\Scott\\Documents\\GitHub\\jotform\\newest_jotform\\resources\\exmaple_json\\{file_name}.json'
+        path = f'/tmp/{file_name}.json'
         #This appends the path variable above to the path_list list object.
         path_list.append(path)
         
@@ -193,15 +204,9 @@ def api_template_build(api_key, form_id):
     for answer in the_answers:
         print('=======================================')
         print(the_answers[answer])
-        print(the_answers[answer]['name'])
-        try:
-            print(the_answers[answer]['answer'])
-        except:
-            print('no answer')
         
         #This try statement will check to see if an answer is present. If it is then it is an actual question rather than a filler. From there,
         #it will take the long text, strip it and remove its commas. It will then make the shorthand the key and the newly formatted text the value. 
-        #copy paste from here
         try:
             answer_test = the_answers[answer]['answer']
             text_question = the_answers[answer]['text'].strip()
@@ -239,11 +244,7 @@ def api_json_template_write(template_dict):
     #This makes the dict object parameter into a json object called my_obj
     my_obj = json.dumps(template_dict)
     #This is the path of the json template
-    '''
-    need to change this path back after testing
-    '''
-    #path = f'/tmp/{file_name}.json'
-    path = f'C:\\Users\\Scott\\Documents\\GitHub\\jotform\\newest_jotform\\resources\\template\\{file_name}.json'
+    path = f'/tmp/{file_name}.json'
     #This creates a new file and has it as a variable of myfile
     with open(path, 'w') as myfile:
         #This writes the json object created above to the file at the specified path
@@ -254,17 +255,14 @@ def api_json_template_write(template_dict):
     print(path)
     return path
     
-'''
- new function 
-'''   
-
+    
 #Function is fragile and will need work on the string manipulation
 def spreadsheet_make(spreadsheet_answer, spreadsheet_name):
     #This will be the list of all of the created objects
     return_dict = {}
     #This splits the string response into a character list
     the_list = list(spreadsheet_answer)
-    print('?????????????????????????????????????????????????')
+    #print('?????????????????????????????????????????????????')
     #The count is necessary to make the dictionary of the different spreadsheet submissions item with the key 1 will always be fill because that is the umbrella list
     the_count = 0
     #This will be the initial dictionary with the sloppy items
@@ -295,8 +293,8 @@ def spreadsheet_make(spreadsheet_answer, spreadsheet_name):
             #The entries are surroudned in double quotes that have to be removed thus the replace
             dic = the_dict[_]#.replace('"', '')
             #this turns the string into a list splitting on commas
-            print('==============')
-            print(dic)
+            #print('==============')
+            #print(dic)
             the_split = dic.split(',\"')
             the_splitter = []
             for o in the_split:
@@ -309,22 +307,20 @@ def spreadsheet_make(spreadsheet_answer, spreadsheet_name):
         if not the_dict[_] == 'fill':
             the_final_list.append(the_dict[_])
     for _ in range(len(the_final_list[0])):
-        print('building the dictionary')
-        print(_)
+        #print('building the dictionary')
+        #print(_)
         if _ == 0:
             pass
         else:
             my_key = spreadsheet_name + ' ' + the_final_list[0][_]
-            print(my_key)
+            #print(my_key)
             return_dict[my_key] = the_final_list[1][_]
     
-    print('*********************************************')
-    print(the_final_list)    
+    #print('*********************************************')
+    #print(the_final_list)    
     print(return_dict)
     return return_dict
 
-
-
     
         
         
@@ -335,63 +331,3 @@ def spreadsheet_make(spreadsheet_answer, spreadsheet_name):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#go go gadget kill yourself
