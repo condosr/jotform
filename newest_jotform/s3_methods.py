@@ -49,7 +49,11 @@ def s3_api_json_put(file_paths, formID, bucket_name):
             name = name[2].replace('.json', '')
             destination = formID + '/' + name
             with open(_, 'rb') as data:
-                s3.upload_fileobj(data, bucket_name, destination)
+                if s3_bucket_file_exist(bucket_name, destination):
+                    print(f'file {name} already exists')
+                else:
+                    print(f'uploading {name}')
+                    s3.upload_fileobj(data, bucket_name, destination)
             data.close()
 
     except:
@@ -72,6 +76,18 @@ def s3_bucket_dir_exist(bucket_name, formID):
     #This try statement is used to see if a bucket exists. This will be used to see if we need to utilize the api or the webhook creation method
     try: 
         s3.get_object(Bucket=bucket_name, Key=(formID+'/'))
+        print('*************************************')
+        print('I exist')
+        return True
+    except:
+        print('*************************************')
+        print('i dont exist')
+        return False
+        
+def s3_bucket_file_exist(bucket_name, key):
+    #This try statement is used to see if a bucket exists. This will be used to see if we need to utilize the api or the webhook creation method
+    try: 
+        s3.get_object(Bucket=bucket_name, Key=(key))
         print('*************************************')
         print('I exist')
         return True
