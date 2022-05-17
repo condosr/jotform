@@ -57,7 +57,6 @@ def submission_grab(api_key, form_id):
             #This try except statement creates a dictionary based on what is passed. If the value of the key value pair is just a string/int then it will
             #Execute as normal or else it will fall into one of the specialized conditionals
             try:
-                
                 #this takes the long hand version of a specified question and stips the white space and assigning it to the my_name variable
                 my_name = answers[answer]['text'].strip()
                 #this takes the variable above and replaces all commas with nospace
@@ -68,6 +67,8 @@ def submission_grab(api_key, form_id):
                     my_name = answers[answer]['name']
                 #This grabs the answer from the answer key/pair value
                 my_answer = answers[answer]['answer']
+                #print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                #print(my_answer)
                 #This turns my_answer into a list if possible(mostly if its a string)
                 try:
                     my_answer_list = list(my_answer)
@@ -83,10 +84,57 @@ def submission_grab(api_key, form_id):
 
                 #new elif statement to catch if a answer is a dictionary type and append all the keys to the master dictionary
                 elif type(my_answer) == dict:
+                    #print('yo')
                     for sub_answer in my_answer:
-                        my_dict[sub_answer] = my_answer[sub_answer]
+                        #print(sub_answer)
+                        #print(my_answer[sub_answer])
+                        #print(type(my_answer[sub_answer]))
+                        if type(my_answer[sub_answer]) == str:
+                            print('im in here now ')
+                            the_answer = my_answer[sub_answer].replace('[', '')
+                            the_answer = the_answer.replace(']', '')
+                            the_answer = the_answer.replace('\"', '')
+                            my_dict[sub_answer] = the_answer
+                            #temp_string = ''
+                            #for element in range(len(my_answer[sub_answer])):
+                                #if len(my_answer[sub_answer]) == 2:
+                                    #temp_string = temp_string + my_answer[sub_answer][element] + ', ' + my_answer[sub_answer][element + 1]
+                                    #break    
+                                #elif element == len(my_answer[sub_answer]) - 1 or element == 0:
+                                    #temp_string = temp_string + my_answer[sub_answer][element]
+                                #elif element == len(my_answer[sub_answer]) - 2:
+                                    #temp_string = temp_string + ', ' + my_answer[sub_answer][element] + ', '
+                                #else:
+                                    #temp_string = temp_string + ', ' + my_answer[sub_answer][element]
+                            #try:
+                                #print('im in the try')
+                                #the_string_list = json.loads(my_answer[sub_answer])
+                                #print(type(the_string_list))
+                                
+                                #temp_string = ''
+                                #for element in range(len(the_string_list)):
+                                    #if len(the_string_list) == 2:
+                                        #temp_string = temp_string + the_string_list[element] + ', ' + the_string_list[element + 1]
+                                        #break    
+                                    #elif element == len(the_string_list) - 1 or element == 0:
+                                        #temp_string = temp_string + the_string_list[element]
+                                    #elif element == len(the_string_list) - 2:
+                                        #temp_string = temp_string + ', ' + the_string_list[element] + ', '
+                                    #else:
+                                        #temp_string = temp_string + ', ' + the_string_list[element]
+                                ##print(the_answer)
+                                #my_dict[sub_answer] = temp_string
+                            #except:
+                                #print('not a disguised list')
+                                #my_dict[sub_answer] = my_answer[sub_answer]
+                        else:
+                            my_dict[sub_answer] = my_answer[sub_answer]
                 #this elif statement looks to see if the answer is a list. If it is it will turn the list into a string with all answers separated by commas 
                 elif type(my_answer) == list:
+                    #temp_string = list_to_string(my_answer)
+                    #print('skipidy boop bop')
+                    #print(temp_string)
+                    
                     temp_string = ''
                     for element in range (len(my_answer)):
                         if len(my_answer) == 2:
@@ -113,12 +161,12 @@ def submission_grab(api_key, form_id):
         per_submission_list.append(my_dict)
         #This adds the list obj to the total list object
         my_list.append(per_submission_list)
-            
+        #print(my_dict)
 
     
 
-    print('my List')
-    print(my_list)
+    #print('my List')
+    #print(my_list)
     #This returns the aggregate list object(the list of all submission objects)
     return my_list
     
@@ -320,6 +368,22 @@ def spreadsheet_make(spreadsheet_answer, spreadsheet_name):
     #print(the_final_list)    
     print(return_dict)
     return return_dict
+    
+    
+    
+def list_to_string(my_list):
+    temp_string = ''
+    if len(my_list) == 2:
+        temp_string = temp_string + my_list[0] + ', ' + my_list[1]
+    else:
+        for element in range(len(my_list)):
+            if element == len(my_list) - 1 or element == 0:
+                temp_string = temp_string + my_list[element]
+            elif element == len(my_list) - 2:
+                temp_string = temp_string + ', ' + my_list[element] + ', '
+            else:
+                temp_string = temp_string + ', ' + my_list[element]     
+    return temp_string
 
     
         
